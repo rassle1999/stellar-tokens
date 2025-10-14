@@ -1,4 +1,4 @@
-import { TokenCard } from "@/components/TokenCard";
+import { TrendingTokenCard } from "@/components/TrendingTokenCard";
 import { PriceChart } from "@/components/PriceChart";
 import { useTokens } from "@/contexts/TokenContext";
 
@@ -15,9 +15,9 @@ export default function Dashboard() {
 
       <div>
         <h2 className="text-xl font-semibold mb-4">Trending Tokens</h2>
-        <div className="max-h-[500px] overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-primary scrollbar-track-secondary">
+        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-primary scrollbar-track-secondary">
           {trendingTokens.map((token) => (
-            <TokenCard key={token.id} {...token} />
+            <TrendingTokenCard key={token.id} {...token} />
           ))}
         </div>
       </div>
