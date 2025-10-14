@@ -1,9 +1,10 @@
 import { TokenCard } from "@/components/TokenCard";
 import { PriceChart } from "@/components/PriceChart";
-import { mockTokens } from "@/lib/mockData";
+import { useTokens } from "@/contexts/TokenContext";
 
 export default function Dashboard() {
-  const trendingTokens = mockTokens.filter(token => token.priceChange > 0).slice(0, 5);
+  const { getTrendingTokens } = useTokens();
+  const trendingTokens = getTrendingTokens();
 
   return (
     <div className="space-y-6 animate-fade-in">

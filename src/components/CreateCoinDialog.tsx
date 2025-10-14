@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTokens } from "@/contexts/TokenContext";
 
 export function CreateCoinDialog() {
   const [open, setOpen] = useState(false);
@@ -21,6 +22,7 @@ export function CreateCoinDialog() {
   const [supply, setSupply] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const { toast } = useToast();
+  const { addToken } = useTokens();
 
   const handleCreate = () => {
     if (!coinName || !symbol || !supply) {
@@ -31,6 +33,24 @@ export function CreateCoinDialog() {
       });
       return;
     }
+
+    // Generate random price and market cap based on supply
+    const supplyNum = parseFloat(supply);
+    const priceNum = Math.random() * 0.1;
+    const marketCapNum = supplyNum * priceNum;
+
+    addToken({
+      name: coinName,
+      symbol: symbol,
+      image: image 
+        ? URL.createObjectURL(image) 
+        : `https://api.dicebear.com/7.x/shapes/svg?seed=${coinName.toLowerCase()}`,
+      marketCap: `$${(marketCapNum / 1000000).toFixed(2)}M`,
+      price: `$${priceNum.toFixed(4)}`,
+      priceChange: Math.random() * 40 - 20, // Random between -20 and +20
+      ethReserveCap: 100,
+      currentReserve: Math.floor(Math.random() * 100),
+    });
 
     toast({
       title: "Token Created!",

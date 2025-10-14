@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { PriceChart } from "@/components/PriceChart";
 import { BuySellCard } from "@/components/BuySellCard";
-import { mockTokens } from "@/lib/mockData";
+import { useTokens } from "@/contexts/TokenContext";
 import { Calendar, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -11,7 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 export default function Token() {
   const { id } = useParams();
   const { toast } = useToast();
-  const token = mockTokens.find((t) => t.id === id);
+  const { getTokenById } = useTokens();
+  const token = getTokenById(id || "");
 
   if (!token) {
     return (

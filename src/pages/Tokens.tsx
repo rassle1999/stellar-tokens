@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { TokenCard } from "@/components/TokenCard";
 import { CreateCoinDialog } from "@/components/CreateCoinDialog";
-import { mockTokens } from "@/lib/mockData";
+import { useTokens } from "@/contexts/TokenContext";
 import {
   Pagination,
   PaginationContent,
@@ -14,12 +14,13 @@ import {
 const ITEMS_PER_PAGE = 6;
 
 export default function Tokens() {
+  const { tokens } = useTokens();
   const [currentPage, setCurrentPage] = useState(1);
   
-  const totalPages = Math.ceil(mockTokens.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(tokens.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentTokens = mockTokens.slice(startIndex, endIndex);
+  const currentTokens = tokens.slice(startIndex, endIndex);
 
   return (
     <div className="space-y-6 animate-fade-in">
