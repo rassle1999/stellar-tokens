@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { TokenCard } from "@/components/TokenCard";
 import { CreateCoinDialog } from "@/components/CreateCoinDialog";
 import { useTokens } from "@/contexts/TokenContext";
+import { getTokensInformation } from "@/lib/tokens/getTokensInformation";
+import { Token } from "@/contexts/TokenContext";
 import {
   Pagination,
   PaginationContent,
@@ -10,13 +12,24 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { set } from "date-fns";
 
 const ITEMS_PER_PAGE = 6;
-
+const updateTokens = async (setTokens: React.Dispatch<React.SetStateAction<Token[]>>) => {
+  try {
+    const tokens = await getTokensInformation();
+    setTokens(tokens);
+    console.log("Fetched tokens:", tokens);
+  } catch (error) {
+    console.error("Error updating tokens:", error);
+  }
+};
 export default function Tokens() {
-  const { tokens } = useTokens();
+  const { tokens ,setTokens } = useTokens();
   const [currentPage, setCurrentPage] = useState(1);
-  
+  useEffect(() => {
+    updateTokens(setTokens);
+  }, []);
   const totalPages = Math.ceil(tokens.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -32,7 +45,7 @@ export default function Tokens() {
         <CreateCoinDialog />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
         {currentTokens.map((token) => (
           <TokenCard key={token.id} {...token} />
         ))}

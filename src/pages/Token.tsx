@@ -7,13 +7,26 @@ import { useTokens } from "@/contexts/TokenContext";
 import { Calendar, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-
+import { getBondingCurveInfo } from "@/lib/BondingCurve/getBondingCurveInfo";
+import { useState, useEffect } from "react";
+const updateReserve = async (setReserve: any, address: string) => {
+  try {
+    const reserveData = await getBondingCurveInfo(address);
+    setReserve(reserveData);
+    console.log("Fetched Reserve:", reserveData);
+  } catch (error) {
+    console.error("Error updating Reserve:", error);
+  }
+};
 export default function Token() {
   const { id } = useParams();
   const { toast } = useToast();
   const { getTokenById } = useTokens();
   const token = getTokenById(id || "");
-
+  const [Reserve, setReserve] = useState({reserveToken:"0",reserveEth:"0",tokenReserveCap:"0",ETHRESERVECAP:5_000_000_000_000_000_000});
+  useEffect(() => {
+    updateReserve(setReserve, token.address);
+  }, []);
   if (!token) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -22,7 +35,7 @@ export default function Token() {
     );
   }
 
-  const progressPercentage = (token.currentReserve / token.ethReserveCap) * 100;
+  const progressPercentage = (parseFloat(Reserve.reserveEth) / Reserve.ETHRESERVECAP) * 100;
 
   const copyAddress = () => {
     navigator.clipboard.writeText(token.address);
@@ -44,11 +57,11 @@ export default function Token() {
                 className="w-full h-full rounded-full object-cover bg-card"
               />
             </div>
-            
+
             <div className="flex-1">
               <h1 className="text-3xl font-bold mb-2">{token.name}</h1>
               <p className="text-lg text-muted-foreground mb-4">{token.symbol}</p>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Market Cap</p>
@@ -59,7 +72,7 @@ export default function Token() {
                   <p className="text-xl font-semibold text-primary">{token.price}</p>
                 </div>
               </div>
-              
+
               <div className="mt-4 space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -90,7 +103,7 @@ export default function Token() {
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Current Reserve</span>
-              <span className="font-medium">{token.currentReserve} / {token.ethReserveCap} ETH</span>
+              <span className="font-medium">{Reserve.reserveEth.toString()} / {Reserve.ETHRESERVECAP.toString()} ETH</span>
             </div>
             <Progress value={progressPercentage} className="h-3" />
             <p className="text-xs text-muted-foreground">

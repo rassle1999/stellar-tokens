@@ -30,15 +30,15 @@ export function TokenCard({ id, name, symbol, image, marketCap, price, priceChan
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                <p className="font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                   {name}
-                </h3>
+                </p>
                 <p className="text-sm text-muted-foreground">{symbol}</p>
               </div>
               
               <div className={`flex items-center gap-1 text-sm font-medium ${isPositive ? 'text-success' : 'text-destructive'}`}>
                 {isPositive ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
-                {Math.abs(priceChange)}%
+                {Math.abs(priceChange).toFixed(1)}%
               </div>
             </div>
             

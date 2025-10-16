@@ -16,6 +16,7 @@ export interface Token {
 
 interface TokenContextType {
   tokens: Token[];
+  setTokens: React.Dispatch<React.SetStateAction<Token[]>>;
   addToken: (token: Omit<Token, "id" | "createdAt" | "address">) => void;
   getTokenById: (id: string) => Token | undefined;
   getTrendingTokens: () => Token[];
@@ -24,7 +25,7 @@ interface TokenContextType {
 const TokenContext = createContext<TokenContextType | undefined>(undefined);
 
 const initialTokens: Token[] = [
-  {
+ /* {
     id: "1",
     name: "Moonshot",
     symbol: "MOON",
@@ -127,7 +128,7 @@ const initialTokens: Token[] = [
     address: "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
     ethReserveCap: 100,
     currentReserve: 48,
-  },
+  },*/
 ];
 
 export function TokenProvider({ children }: { children: ReactNode }) {
@@ -155,6 +156,7 @@ export function TokenProvider({ children }: { children: ReactNode }) {
     <TokenContext.Provider
       value={{
         tokens,
+        setTokens,
         addToken,
         getTokenById,
         getTrendingTokens,
