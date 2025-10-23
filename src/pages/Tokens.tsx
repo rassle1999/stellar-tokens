@@ -5,6 +5,7 @@ import { updateCurrentTokens } from "@/lib/Tokens/updateCurrentTokens";
 import { updateTokenCount } from "@/lib/Tokens/updateTokenCount";
 import { Token,useTokens } from "@/contexts/TokenContext";
 import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Pagination,
   PaginationContent,
@@ -19,6 +20,7 @@ export default function Tokens() {
   const [currentPage, setCurrentPage] = useState(1);
   const {tokens,setTokens} = useTokens();
   const [tokenCount, setTokenCount] = useState(0);
+  const [sortBy, setSortBy] = useState("marketCap");
   useEffect(() => {
     const fetchTokenData = async () => {
       await updateTokenCount(setTokenCount);
@@ -40,6 +42,15 @@ export default function Tokens() {
         </div>
         <CreateCoinDialog />
       </div>
+      
+      <div className="flex justify-center">
+        <ToggleGroup type="single" value={sortBy} onValueChange={setSortBy}>
+          <ToggleGroupItem value="marketCap">Market Cap</ToggleGroupItem>
+          <ToggleGroupItem value="volume">Volume</ToggleGroupItem>
+          <ToggleGroupItem value="date">Date</ToggleGroupItem>
+        </ToggleGroup>
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
         {tokens.map((token) => (
           <TokenCard key={token.id} {...token} />
