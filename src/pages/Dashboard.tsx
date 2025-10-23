@@ -11,16 +11,6 @@ export default function Dashboard() {
   const [ sumData, setSumData] = useState([]);
   const { getTrendingTokens } = useTokens();
   const trendingTokens = getTrendingTokens();
-  let prices:Price[];
-  // useEffect(() => {
-    
-  //     const fetchTotalPrice = async () =>{
-  //       const sumData1=await updateTokens(setTokens);
-  //       prices =await  getTotalPriceInformation(sumData1);
-  //       setSumData(sumData1);
-  //     }
-  //     fetchTotalPrice();
-  //   }, []);
   return (
     <div className="space-y-6 animate-fade-in">
       <div>

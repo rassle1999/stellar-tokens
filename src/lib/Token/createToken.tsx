@@ -8,25 +8,10 @@ export const createToken = async (name: string, symbol: string, uri: string, ini
         console.log("Transaction Hash:", tx.hash);
         const receipt = await tx.wait();
         console.log("Transaction Confirmed:", receipt.transactionHash);
-        console.log("log:", receipt.events);
-        const event = receipt.events?.find(e => e.event === "Deployed");
-        let tokenAddress;
-        const iface = new ethers.utils.Interface(FACTORY_ABI);
-
-        for (const log of receipt.events) {
-            try {
-                const parsed = iface.parseLog(log);
-                console.log("parsed",parsed);
-                if (parsed.name === "Deployed") {
-                    console.log("Token address:", parsed.args.token);
-                    tokenAddress=parsed.args.token;
-                }
-            } catch (err) {
-            }
-        }
-        axios.post(`${BACKEND_URL}/deploy`, { address: tokenAddress, uri: uri, totalSupply: initialSupply.toString(), symbol: symbol, name: name });
+        return true;
     }
     catch (err) {
         console.log("Deploy Error!", err);
+        return false;
     }
 }

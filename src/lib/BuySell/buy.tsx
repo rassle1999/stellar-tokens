@@ -1,6 +1,5 @@
 import { FACTORY_ABI, FACTORY_ADDRESS,BACKEND_URL,TOKEN_ABI } from "../constant";
 import { ethers } from "ethers";
-import axios from "axios";
 export const buy = async (tokenAddress: string, amount: ethers.BigNumber, walletAddress: string, signer: any) => {
     const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);
     try {
@@ -8,28 +7,10 @@ export const buy = async (tokenAddress: string, amount: ethers.BigNumber, wallet
         console.log("Transaction Hash:", tx.hash);
         const receipt = await tx.wait();
         console.log("Transaction Confirmed:", receipt.transactionHash);
-        const iface = new ethers.utils.Interface(FACTORY_ABI);
-        let amountIn,amountOut,price,direction;
-        for (const log of receipt.events) {
-            try {
-                const parsed = iface.parseLog(log);
-                console.log("parsed",parsed);
-                if (parsed.name === "Swap") {
-                    console.log("Token address:", parsed.args.token);
-                    tokenAddress=parsed.args.token;
-                    amountIn=parsed.args.amountIn.toString();
-                    amountOut=parsed.args.amountOut.toString();
-                    price=parsed.args.price.toString();
-                    direction=parsed.args.direction;
-                }
-            } catch (err) {
-            }
-        }
-        const response = await axios.post(`${BACKEND_URL}/buy`,{token:tokenAddress,amountIn:amountIn,amountOut:amountOut,price:price,direction:direction});
-        console.log("response:", response.data);
+        return true;
     }
     catch(err){
-        console.log("Buy Error!",err);
+        return false;
     }
 }
 
@@ -44,27 +25,10 @@ export const sell = async (tokenAddress: string, amount: ethers.BigNumber, walle
         console.log("Transaction Hash:", tx.hash);
         const receipt = await tx.wait();
         console.log("Transaction Confirmed:", receipt.transactionHash);
-        const iface = new ethers.utils.Interface(FACTORY_ABI);
-        let amountIn,amountOut,price,direction;
-        for (const log of receipt.events) {
-            try {
-                const parsed = iface.parseLog(log);
-                console.log("parsed",parsed);
-                if (parsed.name === "Swap") {
-                    console.log("Token address:", parsed.args.token);
-                    tokenAddress=parsed.args.token;
-                    amountIn=parsed.args.amountIn.toString();
-                    amountOut=parsed.args.amountOut.toString();
-                    price=parsed.args.price.toString();
-                    direction=parsed.args.direction;
-                }
-            } catch (err) {
-            }
-        }
-        const response = await axios.post(`${BACKEND_URL}/buy`,{token:tokenAddress,amountIn:amountIn,amountOut:amountOut,price:price,direction:direction});
-        console.log("response:", response.data);
+        return true;
     }
     catch(err){
         console.log("Sell Error!",err);
+        return false;
     }
 }

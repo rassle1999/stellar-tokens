@@ -7,7 +7,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useParams } from "react-router-dom";
 import { useTokens } from "@/contexts/TokenContext";
-import { buy,sell } from "@/lib/BuySell/buy";
+import { buy, sell } from "@/lib/BuySell/buy";
 import { useProvider } from "@/contexts/ProviderContext";
 import { ethers } from "ethers";
 export function BuySellCard() {
@@ -18,7 +18,7 @@ export function BuySellCard() {
   const { getTokenById } = useTokens();
   const { walletProvider, setWalletProvider } = useProvider();
   const token = getTokenById(id || "");
-  console.log("BUYSELL:",token.address);
+  console.log("BUYSELL:", token.address);
   const handleTransaction = async () => {
     if (!amount || parseFloat(amount) <= 0) {
       toast({
@@ -28,20 +28,28 @@ export function BuySellCard() {
       });
       return;
     }
-    const signer =await walletProvider.getSigner();
+    const signer = await walletProvider.getSigner();
     const walletAddress = await signer.getAddress();
-    if(mode == "buy")
-    {
-      buy(token.address,ethers.BigNumber.from(ethers.utils.parseEther(amount)),walletAddress,signer);
+    let success;
+    if (mode == "buy") {
+      success = await buy(token.address, ethers.BigNumber.from(ethers.utils.parseEther(amount)), walletAddress, signer);
+    }
+    else {
+      success = await sell(token.address, ethers.BigNumber.from(ethers.utils.parseEther(amount)), walletAddress, signer);
+    }
+    if (success) {
+      toast({
+        title: `${mode === "buy" ? "Purchase" : "Sale"} Successful`,
+        description: `You have ${mode === "buy" ? "bought" : "sold"} ${amount} tokens`,
+      });
     }
     else{
-      sell(token.address,ethers.BigNumber.from(ethers.utils.parseEther(amount)),walletAddress,signer);
+      toast({
+        title: `${mode === "buy" ? "Purchase" : "Sale"} Failed`,
+        description: `You haven't ${mode === "buy" ? "bought" : "sold"} ${amount} tokens`,
+      });
     }
 
-    toast({
-      title: `${mode === "buy" ? "Purchase" : "Sale"} Successful`,
-      description: `You have ${mode === "buy" ? "bought" : "sold"} ${amount} tokens`,
-    });
 
     setAmount("");
   };
@@ -92,11 +100,10 @@ export function BuySellCard() {
 
         <Button
           onClick={handleTransaction}
-          className={`w-full ${
-            mode === "buy"
+          className={`w-full ${mode === "buy"
               ? "bg-success hover:bg-success/90"
               : "bg-destructive hover:bg-destructive/90"
-          }`}
+            }`}
         >
           {mode === "buy" ? "Buy" : "Sell"}
         </Button>

@@ -26,36 +26,14 @@ export function CreateCoinDialog() {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const { toast } = useToast();
-  const { addToken } = useTokens();
   const { walletProvider, setWalletProvider } = useProvider();
 
   const handleCreate = () => {
-    // if (!coinName || !symbol || !supply) {
-    //   toast({
-    //     title: "Missing fields",
-    //     description: "Please fill in all required fields",
-    //     variant: "destructive",
-    //   });
-    //   return;
-    // }
 
-    // Generate random price and market cap based on supply
     const supplyNum = parseFloat(supply);
     const priceNum = Math.random() * 0.1;
     const marketCapNum = supplyNum * priceNum;
 
-    // addToken({
-    //   name: coinName,
-    //   symbol: symbol,
-    //   image: image 
-    //     ? URL.createObjectURL(image) 
-    //     : `https://api.dicebear.com/7.x/shapes/svg?seed=${coinName.toLowerCase()}`,
-    //   marketCap: `$${(marketCapNum / 1000000).toFixed(2)}M`,
-    //   price: `$${priceNum.toFixed(4)}`,
-    //   priceChange: Math.random() * 40 - 20, // Random between -20 and +20
-    //   ethReserveCap: 100,
-    //   currentReserve: Math.floor(Math.random() * 100),
-    // });
     console.log("file:", image);
     const formData = new FormData();
     formData.append('file', image); // ⬅️ Must match .single('file')
@@ -67,22 +45,32 @@ export function CreateCoinDialog() {
       body: formData, // No need to set headers for FormData manually
     })
       .then(response => response.json())
-      .then(data => {
+      .then(async (data) => {
         const publicUrl = data.publicUrl;
         const urlData = data.urlData;
-        console.log('Public URL:', publicUrl,"urlData:",urlData);
+        console.log('Public URL:', publicUrl);
+        let success;
         try {
-          createToken(coinName, symbol, publicUrl, ethers.BigNumber.from(supply), walletProvider.getSigner());
+          success = await createToken(coinName, symbol, publicUrl, ethers.BigNumber.from(supply), walletProvider.getSigner());
         } catch (err) {
           console.log("Create Token Error:", err);
+          success = false;
         }
-
+        if (success) {
+          toast({
+            title: "Token Created!",
+            description: `${coinName} (${symbol}) has been successfully created.`,
+          });
+        }
+        else {
+          toast({
+            title: "Token Create Failed!",
+            description: `${coinName} (${symbol}) hasn't been created.`,
+          });
+        }
       });
 
-    toast({
-      title: "Token Created!",
-      description: `${coinName} (${symbol}) has been successfully created.`,
-    });
+
 
     setCoinName("");
     setSymbol("");

@@ -11,9 +11,10 @@ import { getBondingCurveInfo } from "@/lib/BondingCurve/getBondingCurveInfo";
 import { useState, useEffect } from "react";
 import { useProvider } from "@/contexts/ProviderContext";
 import { getPriceInformation } from "@/lib/Token/priceInformation";
-const updateReserve = async (setReserve: any, address: string, provider:any) => {
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+const updateReserve = async (setReserve: any, address: string, provider: any) => {
   try {
-    const reserveData = await getBondingCurveInfo(address,provider);
+    const reserveData = await getBondingCurveInfo(address, provider);
     setReserve(reserveData);
   } catch (error) {
     console.error("Error updating Reserve:", error);
@@ -22,11 +23,13 @@ const updateReserve = async (setReserve: any, address: string, provider:any) => 
 export default function Token() {
   const { id } = useParams();
   const { toast } = useToast();
-  const { tokens,getTokenById } = useTokens();
+  const { tokens, getTokenById } = useTokens();
   const { walletProvider, setWalletProvider } = useProvider();
   const token = getTokenById(id || "");
-  const [Reserve, setReserve] = useState({reserveToken:"0",reserveEth:"0",tokenReserveCap:"0",ETHRESERVECAP:5_000_000_000_000_000_000});
-  const [priceData,setPriceData] =useState([]);
+  const [Reserve, setReserve] = useState({ reserveToken: "0", reserveEth: "0", tokenReserveCap: "0", ETHRESERVECAP: 5_000_000_000_000_000_000 });
+  const [priceData, setPriceData] = useState([]);
+  const [timeInterval, setTimeInterval] = useState("1M");
+
   if (!token) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -35,13 +38,16 @@ export default function Token() {
     );
   }
   useEffect(() => {
-    updateReserve(setReserve, token.address,walletProvider);
-    const fetchData = async () =>{
-      setPriceData(await getPriceInformation(token.address));
+    updateReserve(setReserve, token.address, walletProvider);
+    const fetchData = async () => {
+      setPriceData(await getPriceInformation(token.address,timeInterval));
     }
     fetchData();
   }, []);
-  
+  const handleTimeChange = async (value:string) =>{
+    setTimeInterval(value);
+    setPriceData(await getPriceInformation(token.address,value));
+  }
 
   const progressPercentage = (parseFloat(Reserve.reserveEth) / Reserve.ETHRESERVECAP) * 100;
 
@@ -77,7 +83,7 @@ export default function Token() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Price</p>
-                  <p className="text-xl font-semibold text-primary">{(parseFloat(token.price)*(10**10)).toFixed(3)} X 10<sup>-10</sup></p>
+                  <p className="text-xl font-semibold text-primary">{(parseFloat(token.price) * (10 ** 10)).toFixed(3)} X 10<sup>-10</sup></p>
                 </div>
               </div>
 
@@ -119,7 +125,14 @@ export default function Token() {
             </p>
           </div>
         </Card>
-        {priceData.length>0 ? <PriceChart flag={false} priceData={priceData} /> : <div></div>}
+        <div className="flex justify-center">
+          <ToggleGroup type="single" value={timeInterval} onValueChange={handleTimeChange}>
+            <ToggleGroupItem value="1h">1h</ToggleGroupItem>
+            <ToggleGroupItem value="1D">1D</ToggleGroupItem>
+            <ToggleGroupItem value="1M">1M</ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+        {priceData.length > 0 ? <PriceChart flag={false} priceData={priceData} /> : <div></div>}
       </div>
 
       <div>
