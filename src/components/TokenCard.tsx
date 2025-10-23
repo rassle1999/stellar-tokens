@@ -1,6 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { Link } from "react-router-dom";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useState } from "react";
 
 interface TokenCardProps {
   id: string;
@@ -14,6 +16,7 @@ interface TokenCardProps {
 
 export function TokenCard({ id, name, symbol, image, marketCap, price, priceChange }: TokenCardProps) {
   const isPositive = priceChange >= 0;
+  const [sortBy, setSortBy] = useState("marketCap");
 
   return (
     <Link to={`/token/${id}`}>
@@ -51,6 +54,14 @@ export function TokenCard({ id, name, symbol, image, marketCap, price, priceChan
                 <span className="text-muted-foreground">Price</span>
                 <span className="font-medium text-primary">{(parseFloat(price)*(10**10)).toFixed(2)} X 10<sup>-10</sup></span>
               </div>
+            </div>
+            
+            <div className="mt-4 flex justify-center" onClick={(e) => e.preventDefault()}>
+              <ToggleGroup type="single" value={sortBy} onValueChange={setSortBy} size="sm">
+                <ToggleGroupItem value="marketCap" className="text-xs">Market Cap</ToggleGroupItem>
+                <ToggleGroupItem value="volume" className="text-xs">Volume</ToggleGroupItem>
+                <ToggleGroupItem value="date" className="text-xs">Date</ToggleGroupItem>
+              </ToggleGroup>
             </div>
           </div>
         </div>

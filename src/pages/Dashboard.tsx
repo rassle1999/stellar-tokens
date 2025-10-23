@@ -3,7 +3,7 @@ import { PriceChart } from "@/components/PriceChart";
 import { useTokens } from "@/contexts/TokenContext";
 // import { updateTokens } from "@/lib/Tokens/updateCurrentTokens";
 import { useEffect } from "react";
-import { getTotalPriceInformation } from "@/lib/Token/priceInformation";
+// import { getTotalPriceInformation } from "@/lib/Token/priceInformation";
 import { Price } from "@/contexts/PriceContext";
 import { useState } from "react";
 export default function Dashboard() {

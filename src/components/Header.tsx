@@ -37,12 +37,17 @@ export function Header() {
   return (
     <header className="fixed top-0 left-64 right-0 h-16 bg-card/50 backdrop-blur-lg border-b border-border z-10">
       <div className="h-full px-6 flex items-center justify-between gap-4">
-        <div className="flex-1 max-w-md relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search Tokens..."
-            className="pl-10 bg-secondary border-border focus:border-primary transition-colors"
-          />
+        <div className="flex-1 max-w-md flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search Tokens..."
+              className="pl-10 bg-secondary border-border focus:border-primary transition-colors"
+            />
+          </div>
+          <Button variant="default" size="default">
+            <Search className="h-4 w-4" />
+          </Button>
         </div>
         <WalletProvider/>
         {/* <Button
