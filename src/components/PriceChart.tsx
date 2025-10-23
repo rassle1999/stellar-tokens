@@ -1,53 +1,39 @@
-import { Card } from "@/components/ui/card";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-
-const generateMockData = () => {
-  const data = [];
-  const now = Date.now();
-  for (let i = 24; i >= 0; i--) {
-    data.push({
-      time: new Date(now - i * 3600000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-      price: Math.random() * 50 + 50,
-    });
-  }
-  return data;
-};
-
-export function PriceChart() {
-  const data = generateMockData();
-
+import { ApexOptions } from "apexcharts";
+import Chart from "react-apexcharts";
+import { useState,useEffect } from "react";
+import { getPriceInformation } from "@/lib/Token/priceInformation";
+interface PriceChartProps {
+  flag?: boolean;
+  priceData:any[];
+}
+export function PriceChart({ flag ,priceData}: PriceChartProps) {
+  const options: ApexOptions = {
+    chart: { type: "candlestick" },
+    xaxis: { type: "datetime" },
+    tooltip: {
+      theme: "black", // ✅ force light mode tooltip (black text)
+      style: {
+        fontSize: "12px",
+        fontFamily: "inherit",
+      },
+    },
+  };
+  const series = [
+    {
+      data: [
+        // { x: new Date("2025-10-18T10:00:00"), y: [0.1, 0.15, 0.08, 0.12] },
+        // { x: new Date("2025-10-18T10:05:00"), y: [0.12, 0.18, 0.10, 0.14] },
+      ],
+    },
+  ];
+  for(var i=0;i<priceData.length;i++){
+      const price_A=parseFloat(priceData[i-1]?.price)/(10**8)||0;
+      const price_B=parseFloat(priceData[i].price)/(10**8);
+      series[0].data.push({x:new Date(priceData[i].time*1000),y:[price_A,price_B,price_A,price_B]})
+    }
   return (
-    <Card className="p-6 bg-gradient-card border-border">
-      <h3 className="text-lg font-semibold mb-4">Price Change Over Time</h3>
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis
-            dataKey="time"
-            stroke="hsl(var(--muted-foreground))"
-            tick={{ fill: 'hsl(var(--muted-foreground))' }}
-          />
-          <YAxis
-            stroke="hsl(var(--muted-foreground))"
-            tick={{ fill: 'hsl(var(--muted-foreground))' }}
-          />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: 'hsl(var(--card))',
-              border: '1px solid hsl(var(--border))',
-              borderRadius: '8px',
-            }}
-            labelStyle={{ color: 'hsl(var(--foreground))' }}
-          />
-          <Line
-            type="monotone"
-            dataKey="price"
-            stroke="hsl(var(--primary))"
-            strokeWidth={2}
-            dot={false}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    </Card>
+    <div>
+      <Chart options={options} series={series} type="candlestick" height={350} />
+    </div>
   );
 }

@@ -1,11 +1,26 @@
 import { TrendingTokenCard } from "@/components/TrendingTokenCard";
 import { PriceChart } from "@/components/PriceChart";
 import { useTokens } from "@/contexts/TokenContext";
-
+// import { updateTokens } from "@/lib/Tokens/updateCurrentTokens";
+import { useEffect } from "react";
+import { getTotalPriceInformation } from "@/lib/Token/priceInformation";
+import { Price } from "@/contexts/PriceContext";
+import { useState } from "react";
 export default function Dashboard() {
+  const { tokens ,setTokens } = useTokens();
+  const [ sumData, setSumData] = useState([]);
   const { getTrendingTokens } = useTokens();
   const trendingTokens = getTrendingTokens();
-
+  let prices:Price[];
+  // useEffect(() => {
+    
+  //     const fetchTotalPrice = async () =>{
+  //       const sumData1=await updateTokens(setTokens);
+  //       prices =await  getTotalPriceInformation(sumData1);
+  //       setSumData(sumData1);
+  //     }
+  //     fetchTotalPrice();
+  //   }, []);
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
@@ -21,8 +36,7 @@ export default function Dashboard() {
           ))}
         </div>
       </div>
-
-      <PriceChart />
+      {/* {sumData.length!=0?<PriceChart flag={true} sumData={sumData}/>:<div>No Graph</div>} */}
     </div>
   );
 }

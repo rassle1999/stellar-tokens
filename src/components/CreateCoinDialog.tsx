@@ -14,43 +14,70 @@ import { Label } from "@/components/ui/label";
 import { Plus, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTokens } from "@/contexts/TokenContext";
-
+import { BACKEND_URL } from "@/lib/constant";
+import { createToken } from "@/lib/Token/createToken";
+import { useProvider } from "@/contexts/ProviderContext";
+import { ethers } from "ethers";
 export function CreateCoinDialog() {
   const [open, setOpen] = useState(false);
   const [coinName, setCoinName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [supply, setSupply] = useState("");
+  const [description, setDescription] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const { toast } = useToast();
   const { addToken } = useTokens();
+  const { walletProvider, setWalletProvider } = useProvider();
 
   const handleCreate = () => {
-    if (!coinName || !symbol || !supply) {
-      toast({
-        title: "Missing fields",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
+    // if (!coinName || !symbol || !supply) {
+    //   toast({
+    //     title: "Missing fields",
+    //     description: "Please fill in all required fields",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
 
     // Generate random price and market cap based on supply
     const supplyNum = parseFloat(supply);
     const priceNum = Math.random() * 0.1;
     const marketCapNum = supplyNum * priceNum;
 
-    addToken({
-      name: coinName,
-      symbol: symbol,
-      image: image 
-        ? URL.createObjectURL(image) 
-        : `https://api.dicebear.com/7.x/shapes/svg?seed=${coinName.toLowerCase()}`,
-      marketCap: `$${(marketCapNum / 1000000).toFixed(2)}M`,
-      price: `$${priceNum.toFixed(4)}`,
-      priceChange: Math.random() * 40 - 20, // Random between -20 and +20
-      ethReserveCap: 100,
-      currentReserve: Math.floor(Math.random() * 100),
-    });
+    // addToken({
+    //   name: coinName,
+    //   symbol: symbol,
+    //   image: image 
+    //     ? URL.createObjectURL(image) 
+    //     : `https://api.dicebear.com/7.x/shapes/svg?seed=${coinName.toLowerCase()}`,
+    //   marketCap: `$${(marketCapNum / 1000000).toFixed(2)}M`,
+    //   price: `$${priceNum.toFixed(4)}`,
+    //   priceChange: Math.random() * 40 - 20, // Random between -20 and +20
+    //   ethReserveCap: 100,
+    //   currentReserve: Math.floor(Math.random() * 100),
+    // });
+    console.log("file:", image);
+    const formData = new FormData();
+    formData.append('file', image); // ⬅️ Must match .single('file')
+    formData.append('name', coinName);
+    formData.append('symbol', symbol);
+    formData.append('description', description);
+    fetch(`${BACKEND_URL}/upload`, {
+      method: 'POST',
+      body: formData, // No need to set headers for FormData manually
+    })
+      .then(response => response.json())
+      .then(data => {
+        const publicUrl = data.publicUrl;
+        const urlData = data.urlData;
+        console.log('Public URL:', publicUrl,"urlData:",urlData);
+        try {
+          createToken(coinName, symbol, publicUrl, ethers.BigNumber.from(supply), walletProvider.getSigner());
+        } catch (err) {
+          console.log("Create Token Error:", err);
+        }
+
+      });
 
     toast({
       title: "Token Created!",
@@ -60,6 +87,7 @@ export function CreateCoinDialog() {
     setCoinName("");
     setSymbol("");
     setSupply("");
+    setDescription("");
     setImage(null);
     setOpen(false);
   };
@@ -79,7 +107,7 @@ export function CreateCoinDialog() {
             Fill in the details to create your new token.
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="name">Token Name</Label>
@@ -91,7 +119,7 @@ export function CreateCoinDialog() {
               className="bg-secondary border-border"
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="symbol">Symbol</Label>
             <Input
@@ -102,7 +130,7 @@ export function CreateCoinDialog() {
               className="bg-secondary border-border"
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="supply">Total Supply</Label>
             <Input
@@ -114,7 +142,17 @@ export function CreateCoinDialog() {
               className="bg-secondary border-border"
             />
           </div>
-          
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Input
+              id="description"
+              placeholder="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="bg-secondary border-border"
+            />
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="image">Token Image</Label>
             <div className="flex items-center gap-2">
@@ -134,7 +172,7 @@ export function CreateCoinDialog() {
             </div>
           </div>
         </div>
-        
+
         <DialogFooter>
           <Button
             onClick={handleCreate}

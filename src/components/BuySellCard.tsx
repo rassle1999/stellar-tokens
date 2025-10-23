@@ -5,13 +5,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-
+import { useParams } from "react-router-dom";
+import { useTokens } from "@/contexts/TokenContext";
+import { buy,sell } from "@/lib/BuySell/buy";
+import { useProvider } from "@/contexts/ProviderContext";
+import { ethers } from "ethers";
 export function BuySellCard() {
+  const { id } = useParams();
   const [mode, setMode] = useState<"buy" | "sell">("buy");
   const [amount, setAmount] = useState("");
   const { toast } = useToast();
-
-  const handleTransaction = () => {
+  const { getTokenById } = useTokens();
+  const { walletProvider, setWalletProvider } = useProvider();
+  const token = getTokenById(id || "");
+  console.log("BUYSELL:",token.address);
+  const handleTransaction = async () => {
     if (!amount || parseFloat(amount) <= 0) {
       toast({
         title: "Invalid amount",
@@ -19,6 +27,15 @@ export function BuySellCard() {
         variant: "destructive",
       });
       return;
+    }
+    const signer =await walletProvider.getSigner();
+    const walletAddress = await signer.getAddress();
+    if(mode == "buy")
+    {
+      buy(token.address,ethers.BigNumber.from(ethers.utils.parseEther(amount)),walletAddress,signer);
+    }
+    else{
+      sell(token.address,ethers.BigNumber.from(ethers.utils.parseEther(amount)),walletAddress,signer);
     }
 
     toast({

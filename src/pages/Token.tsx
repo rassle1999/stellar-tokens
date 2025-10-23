@@ -9,11 +9,12 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { getBondingCurveInfo } from "@/lib/BondingCurve/getBondingCurveInfo";
 import { useState, useEffect } from "react";
-const updateReserve = async (setReserve: any, address: string) => {
+import { useProvider } from "@/contexts/ProviderContext";
+import { getPriceInformation } from "@/lib/Token/priceInformation";
+const updateReserve = async (setReserve: any, address: string, provider:any) => {
   try {
-    const reserveData = await getBondingCurveInfo(address);
+    const reserveData = await getBondingCurveInfo(address,provider);
     setReserve(reserveData);
-    console.log("Fetched Reserve:", reserveData);
   } catch (error) {
     console.error("Error updating Reserve:", error);
   }
@@ -21,12 +22,11 @@ const updateReserve = async (setReserve: any, address: string) => {
 export default function Token() {
   const { id } = useParams();
   const { toast } = useToast();
-  const { getTokenById } = useTokens();
+  const { tokens,getTokenById } = useTokens();
+  const { walletProvider, setWalletProvider } = useProvider();
   const token = getTokenById(id || "");
   const [Reserve, setReserve] = useState({reserveToken:"0",reserveEth:"0",tokenReserveCap:"0",ETHRESERVECAP:5_000_000_000_000_000_000});
-  useEffect(() => {
-    updateReserve(setReserve, token.address);
-  }, []);
+  const [priceData,setPriceData] =useState([]);
   if (!token) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -34,6 +34,14 @@ export default function Token() {
       </div>
     );
   }
+  useEffect(() => {
+    updateReserve(setReserve, token.address,walletProvider);
+    const fetchData = async () =>{
+      setPriceData(await getPriceInformation(token.address));
+    }
+    fetchData();
+  }, []);
+  
 
   const progressPercentage = (parseFloat(Reserve.reserveEth) / Reserve.ETHRESERVECAP) * 100;
 
@@ -65,11 +73,11 @@ export default function Token() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Market Cap</p>
-                  <p className="text-xl font-semibold">{token.marketCap}</p>
+                  <p className="text-xl font-semibold">{parseFloat(token.marketCap).toFixed(3)}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Price</p>
-                  <p className="text-xl font-semibold text-primary">{token.price}</p>
+                  <p className="text-xl font-semibold text-primary">{(parseFloat(token.price)*(10**10)).toFixed(3)} X 10<sup>-10</sup></p>
                 </div>
               </div>
 
@@ -77,7 +85,7 @@ export default function Token() {
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Created:</span>
-                  <span className="font-medium">{token.createdAt}</span>
+                  <span className="font-medium">{(new Date(parseInt(token.createdAt) * 1000)).toUTCString()}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-muted-foreground">Contract:</span>
@@ -111,8 +119,7 @@ export default function Token() {
             </p>
           </div>
         </Card>
-
-        <PriceChart />
+        {priceData.length>0 ? <PriceChart flag={false} priceData={priceData} /> : <div></div>}
       </div>
 
       <div>
