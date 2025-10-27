@@ -1,4 +1,4 @@
-import { FACTORY_ABI, FACTORY_ADDRESS,BACKEND_URL,TOKEN_ABI } from "../constant";
+import { FACTORY_ABI, FACTORY_ADDRESS,BACKEND_URL,TOKEN_ABI } from "../basic/constant";
 import { ethers } from "ethers";
 export const buy = async (tokenAddress: string, amount: ethers.BigNumber, walletAddress: string, signer: any) => {
     const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, signer);

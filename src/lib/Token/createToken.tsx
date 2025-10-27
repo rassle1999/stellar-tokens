@@ -1,4 +1,4 @@
-import { FACTORY_ABI, FACTORY_ADDRESS, BACKEND_URL } from "../constant";
+import { FACTORY_ABI, FACTORY_ADDRESS, BACKEND_URL } from "../basic/constant";
 import { ethers } from "ethers";
 import axios from "axios";
 export const createToken = async (name: string, symbol: string, uri: string, initialSupply: ethers.BigNumber, signer: any) => {

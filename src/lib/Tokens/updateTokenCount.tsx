@@ -1,4 +1,4 @@
-import { BACKEND_URL } from "../constant";
+import { BACKEND_URL } from "../basic/constant";
 import axios from "axios";
 export const updateTokenCount = async (setTokenCount) => {
     try {

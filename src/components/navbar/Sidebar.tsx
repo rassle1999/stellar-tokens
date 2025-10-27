@@ -1,6 +1,6 @@
 import { LayoutDashboard, Coins } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/basic/utils";
 
 const navItems = [
   { title: "Dashboard", icon: LayoutDashboard, url: "/" },

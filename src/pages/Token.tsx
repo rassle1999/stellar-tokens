@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { PriceChart } from "@/components/PriceChart";
-import { BuySellCard } from "@/components/BuySellCard";
+import { BuySellCard } from "@/components/card/BuySellCard";
 import { useTokens } from "@/contexts/TokenContext";
 import { Calendar, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -39,14 +39,24 @@ export default function Token() {
   }
   useEffect(() => {
     updateReserve(setReserve, token.address, walletProvider);
+    const ws = new WebSocket("ws://localhost:5010");
+    ws.onmessage = (msg) => {
+      const update = async () => {
+        setPriceData(await getPriceInformation(token.address, timeInterval));
+        console.log("updated");
+      }
+      if(msg.data.type==1)
+      update();
+    }
     const fetchData = async () => {
-      setPriceData(await getPriceInformation(token.address,timeInterval));
+      setPriceData(await getPriceInformation(token.address, timeInterval));
     }
     fetchData();
+    return () => ws.close();
   }, []);
-  const handleTimeChange = async (value:string) =>{
+  const handleTimeChange = async (value: string) => {
     setTimeInterval(value);
-    setPriceData(await getPriceInformation(token.address,value));
+    setPriceData(await getPriceInformation(token.address, value));
   }
 
   const progressPercentage = (parseFloat(Reserve.reserveEth) / Reserve.ETHRESERVECAP) * 100;

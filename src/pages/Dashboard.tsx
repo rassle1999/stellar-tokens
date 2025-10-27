@@ -1,4 +1,4 @@
-import { TrendingTokenCard } from "@/components/TrendingTokenCard";
+import { TrendingTokenCard } from "@/components/card/TrendingTokenCard";
 import { PriceChart } from "@/components/PriceChart";
 import { useTokens } from "@/contexts/TokenContext";
 // import { updateTokens } from "@/lib/Tokens/updateCurrentTokens";
