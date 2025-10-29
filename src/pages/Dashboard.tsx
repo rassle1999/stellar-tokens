@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
 export default function Dashboard() {
   const { tokens ,setTokens } = useTokens();
@@ -102,7 +103,9 @@ export default function Dashboard() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm">Migrate</Button>
+                    <Badge variant={token.currentReserve >= token.ethReserveCap ? "default" : "secondary"}>
+                      {token.currentReserve >= token.ethReserveCap ? "Migrated" : "Active"}
+                    </Badge>
                   </TableCell>
                   <TableCell className="text-right font-semibold">
                     {((parseFloat(token.price)*(10**10))/1e18).toFixed(6)}
