@@ -23,8 +23,10 @@ export function PriceChart({ flag, priceData }: PriceChartProps) {
       ],
     },
   ];
+  const price_A = parseFloat(priceData[0].price) / (10 ** 8) || 0;
+  // series[0].data.push({ x: new Date(priceData[0].time * 1000), y: [price_A, price_A, price_A, price_A] })
   for (var i = 1; i < priceData.length; i++) {
-    const price_A = parseFloat(priceData[i - 1]?.price) / (10 ** 8) || 0;
+    const price_A = parseFloat(priceData[i - 1].price) / (10 ** 8) || 0;
     const price_B = parseFloat(priceData[i].price) / (10 ** 8);
     series[0].data.push({ x: new Date(priceData[i].time * 1000), y: [price_A, price_B, price_A, price_B] })
   }

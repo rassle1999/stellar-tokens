@@ -18,7 +18,7 @@ export function TokenCard({ id, name, symbol, image, marketCap, price, priceChan
   return (
     <Link to={`/token/${id}`}>
       <Card className="p-4 bg-gradient-card hover:shadow-glow-primary transition-all duration-300 cursor-pointer group border-border">
-        <div className="flex items-start gap-4">
+        <div className="flex items-start gap-2">
           <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent p-0.5 shrink-0">
             <img
               src={image}
@@ -42,14 +42,14 @@ export function TokenCard({ id, name, symbol, image, marketCap, price, priceChan
               </div>
             </div>
             
-            <div className="mt-3 space-y-1">
+            <div className="mt-3 space-y-0">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Market Cap</span>
-                <span className="font-medium text-foreground">{parseFloat(marketCap).toFixed(2)}</span>
+                <span className="font-medium text-foreground">{(parseFloat(marketCap)/1e36).toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Price</span>
-                <span className="font-medium text-primary">{(parseFloat(price)*(10**10)).toFixed(2)} X 10<sup>-10</sup></span>
+                <span className="font-medium text-primary">{((parseFloat(price)*(10**10))/1e18).toFixed(2)} X 10<sup>-10</sup></span>
               </div>
             </div>
           </div>

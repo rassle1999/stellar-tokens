@@ -18,7 +18,6 @@ export function BuySellCard() {
   const { getTokenById } = useTokens();
   const { walletProvider, setWalletProvider } = useProvider();
   const token = getTokenById(id || "");
-  console.log("BUYSELL:", token.address);
   const handleTransaction = async () => {
     if (!amount || parseFloat(amount) <= 0) {
       toast({
@@ -32,10 +31,10 @@ export function BuySellCard() {
     const walletAddress = await signer.getAddress();
     let success;
     if (mode == "buy") {
-      success = await buy(token.address, ethers.BigNumber.from(ethers.utils.parseEther(amount)), walletAddress, signer);
+      success = await buy(token?.address, ethers.BigNumber.from(ethers.utils.parseEther(amount)), walletAddress, signer);
     }
     else {
-      success = await sell(token.address, ethers.BigNumber.from(ethers.utils.parseEther(amount)), walletAddress, signer);
+      success = await sell(token?.address, ethers.BigNumber.from(ethers.utils.parseEther(amount)), walletAddress, signer);
     }
     if (success) {
       toast({

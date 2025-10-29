@@ -12,6 +12,7 @@ import { useState, useEffect } from "react";
 import { useProvider } from "@/contexts/ProviderContext";
 import { getPriceInformation } from "@/lib/Token/priceInformation";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { getTokenDatabyAddress } from "@/lib/Token/tokenData";
 const updateReserve = async (setReserve: any, address: string, provider: any) => {
   try {
     const reserveData = await getBondingCurveInfo(address, provider);
@@ -20,6 +21,14 @@ const updateReserve = async (setReserve: any, address: string, provider: any) =>
     console.error("Error updating Reserve:", error);
   }
 };
+const updateToken = async (setToken:any,address:string) => {
+  try {
+    const token = await getTokenDatabyAddress(address);
+    setToken(token);
+  } catch (error) {
+    console.error("Error updating Token:", error);
+  }
+}
 export default function Token() {
   const { id } = useParams();
   const { toast } = useToast();
@@ -43,7 +52,6 @@ export default function Token() {
     ws.onmessage = (msg) => {
       const update = async () => {
         setPriceData(await getPriceInformation(token.address, timeInterval));
-        console.log("updated");
       }
       if(msg.data.type==1)
       update();
@@ -89,11 +97,11 @@ export default function Token() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Market Cap</p>
-                  <p className="text-xl font-semibold">{parseFloat(token.marketCap).toFixed(3)}</p>
+                  <p className="text-xl font-semibold">{(parseFloat(token.marketCap)/1e36).toFixed(3)}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Price</p>
-                  <p className="text-xl font-semibold text-primary">{(parseFloat(token.price) * (10 ** 10)).toFixed(3)} X 10<sup>-10</sup></p>
+                  <p className="text-xl font-semibold text-primary">{(parseFloat(token.price)/1e18 * (10 ** 10)).toFixed(3)} X 10<sup>-10</sup></p>
                 </div>
               </div>
 

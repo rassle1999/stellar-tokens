@@ -1,16 +1,23 @@
 import { TrendingTokenCard } from "@/components/card/TrendingTokenCard";
 import { PriceChart } from "@/components/PriceChart";
 import { useTokens } from "@/contexts/TokenContext";
-// import { updateTokens } from "@/lib/Tokens/updateCurrentTokens";
 import { useEffect } from "react";
-// import { getTotalPriceInformation } from "@/lib/Token/priceInformation";
 import { Price } from "@/contexts/PriceContext";
 import { useState } from "react";
+import { updateTrendingTokens } from "@/lib/Tokens/updateTrendingTokens";
+import { getDashChartData } from "@/lib/chart/dashChartData";
 export default function Dashboard() {
   const { tokens ,setTokens } = useTokens();
   const [ sumData, setSumData] = useState([]);
   const { getTrendingTokens } = useTokens();
-  const trendingTokens = getTrendingTokens();
+  const [trendingTokens,setTrendingTokens] = useState([]);
+  useEffect(()=>{
+    const fetchData = async () =>{
+      await updateTrendingTokens(setTrendingTokens);
+      // await getDashChartData();
+    }
+    fetchData();
+  },[])
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
