@@ -6,18 +6,31 @@ import { Price } from "@/contexts/PriceContext";
 import { useState } from "react";
 import { updateTrendingTokens } from "@/lib/Tokens/updateTrendingTokens";
 import { getDashChartData } from "@/lib/chart/dashChartData";
+import { updateCurrentTokens } from "@/lib/Tokens/updateCurrentTokens";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
 export default function Dashboard() {
   const { tokens ,setTokens } = useTokens();
   const [ sumData, setSumData] = useState([]);
   const { getTrendingTokens } = useTokens();
   const [trendingTokens,setTrendingTokens] = useState([]);
+  const [tableTokens, setTableTokens] = useState([]);
+  const [limit, setLimit] = useState(10);
+  
   useEffect(()=>{
     const fetchData = async () =>{
       await updateTrendingTokens(setTrendingTokens);
-      // await getDashChartData();
+      await updateCurrentTokens(setTableTokens, 1, "latest", "");
     }
     fetchData();
   },[])
+  
+  const handleLimitChange = async () => {
+    await updateCurrentTokens(setTableTokens, 1, "latest", "");
+  };
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
@@ -33,6 +46,74 @@ export default function Dashboard() {
           ))}
         </div>
       </div>
+
+      <div className="space-y-4">
+        <div className="flex items-end gap-4">
+          <div className="flex-1 max-w-xs">
+            <Label htmlFor="limit">Show Limit</Label>
+            <div className="flex gap-2">
+              <Input
+                id="limit"
+                type="number"
+                min="1"
+                value={limit}
+                onChange={(e) => setLimit(parseInt(e.target.value) || 10)}
+                className="w-full"
+              />
+              <Button onClick={handleLimitChange}>Apply</Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Image</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Symbol</TableHead>
+                <TableHead>Address</TableHead>
+                <TableHead>Migrate</TableHead>
+                <TableHead className="text-right">Price</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tableTokens.slice(0, limit).map((token) => (
+                <TableRow key={token.id}>
+                  <TableCell>
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent p-0.5">
+                      <img
+                        src={token.image}
+                        alt={token.name}
+                        className="w-full h-full rounded-full object-cover bg-card"
+                      />
+                    </div>
+                  </TableCell>
+                  <TableCell className="font-medium">{token.name}</TableCell>
+                  <TableCell>{token.symbol}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <code className="text-xs">{token.address?.slice(0, 6)}...{token.address?.slice(-4)}</code>
+                      <Button variant="ghost" size="icon" className="h-6 w-6" asChild>
+                        <a href={`https://etherscan.io/address/${token.address}`} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </Button>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="outline" size="sm">Migrate</Button>
+                  </TableCell>
+                  <TableCell className="text-right font-semibold">
+                    {((parseFloat(token.price)*(10**10))/1e18).toFixed(6)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+      
       {/* {sumData.length!=0?<PriceChart flag={true} sumData={sumData}/>:<div>No Graph</div>} */}
     </div>
   );
