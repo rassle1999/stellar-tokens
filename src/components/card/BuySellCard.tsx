@@ -91,7 +91,7 @@ export function BuySellCard() {
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="amount">Amount (ETH)</Label>
+          <Label htmlFor="amount">Amount ({mode === "buy" ? "ETH" : "TOKEN"})</Label>
           <Input
             id="amount"
             type="number"
@@ -103,7 +103,7 @@ export function BuySellCard() {
           />
         </div>
 
-        <div className="p-3 bg-secondary rounded-lg">
+        {/* <div className="p-3 bg-secondary rounded-lg">
           <div className="flex justify-between text-sm mb-1">
             <span className="text-muted-foreground">You will receive</span>
             <span className="font-medium">~{amount ? (parseFloat(amount) * 1000).toFixed(2) : "0.00"} tokens</span>
@@ -112,7 +112,7 @@ export function BuySellCard() {
             <span className="text-muted-foreground">Fee</span>
             <span className="font-medium">0.3%</span>
           </div>
-        </div>
+        </div> */}
 
         <Button
           onClick={handleTransaction}

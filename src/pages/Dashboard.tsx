@@ -15,22 +15,28 @@ import { ExternalLink } from "lucide-react";
 import { updateTokenState } from "@/lib/Tokens/updateTokenState";
 import { RPC_provider } from "@/lib/basic/constant";
 export default function Dashboard() {
-  const { tokens ,setTokens } = useTokens();
-  const [trendingTokens,setTrendingTokens] = useState([]);
+  const { tokens, setTokens } = useTokens();
+  const [trendingTokens, setTrendingTokens] = useState([]);
   const [tableTokens, setTableTokens] = useState([]);
   const [limit, setLimit] = useState(10);
-  
-  useEffect(()=>{
-    const fetchData = async () =>{
+
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:5010");
+    ws.onmessage = (msg) => {
+      const update = async () => {
+        console.log("updating...");
+        await updateTrendingTokens(setTrendingTokens);
+        await updateTokenState(setTableTokens, 10, RPC_provider);
+      }
+      console.log("broadcast is arrived", msg);
+      update();
+    }
+    const fetchData = async () => {
       await updateTrendingTokens(setTrendingTokens);
-      await updateTokenState(setTableTokens, 10,RPC_provider);
+      await updateTokenState(setTableTokens, 10, RPC_provider);
     }
     fetchData();
-  },[])
-  
-  const handleLimitChange = async () => {
-    await updateTokenState(setTableTokens, limit,RPC_provider);
-  };
+  }, [])
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
@@ -48,22 +54,6 @@ export default function Dashboard() {
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-end gap-4">
-          <div className="flex-1 max-w-xs">
-            <Label htmlFor="limit">Show Limit</Label>
-            <div className="flex gap-2">
-              <Input
-                id="limit"
-                type="number"
-                min="1"
-                value={limit}
-                onChange={(e) => setLimit(parseInt(e.target.value) || 10)}
-                className="w-full"
-              />
-              <Button onClick={handleLimitChange}>Apply</Button>
-            </div>
-          </div>
-        </div>
 
         <div className="rounded-md border">
           <Table>
@@ -73,7 +63,6 @@ export default function Dashboard() {
                 <TableHead>Name</TableHead>
                 <TableHead>Symbol</TableHead>
                 <TableHead>Address</TableHead>
-                {/* <TableHead>Migrate</TableHead> */}
                 <TableHead className="text-right">Price</TableHead>
               </TableRow>
             </TableHeader>
@@ -101,13 +90,8 @@ export default function Dashboard() {
                       </Button>
                     </div>
                   </TableCell>
-                  {/* <TableCell>
-                    <Badge variant={token.isMigrated ? "default" : "secondary"}>
-                      {token.isMigrated ? "Migrated" : "Active"}
-                    </Badge>
-                  </TableCell> */}
                   <TableCell className="text-right font-semibold">
-                    {((parseFloat(token.price)*(10**10))/1e18).toFixed(6)}
+                    {((parseFloat(token.price) * (10 ** 10)) / 1e18).toFixed(6)}
                   </TableCell>
                 </TableRow>
               ))}
@@ -115,7 +99,7 @@ export default function Dashboard() {
           </Table>
         </div>
       </div>
-      
+
       {/* {sumData.length!=0?<PriceChart flag={true} sumData={sumData}/>:<div>No Graph</div>} */}
     </div>
   );

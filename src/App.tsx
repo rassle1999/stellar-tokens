@@ -13,7 +13,7 @@ import Token from "./pages/Token";
 import NotFound from "./pages/NotFound";
 
 import { WagmiProvider } from 'wagmi';
-import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { RainbowKitProvider ,darkTheme } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
 import { config } from './wagmi';
 
@@ -22,7 +22,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <WagmiProvider config={config}>
     <QueryClientProvider client={queryClient}>
-      <RainbowKitProvider>
+      <RainbowKitProvider theme={darkTheme()}>
         <TooltipProvider>
           <TokenProvider>
             <PriceProvider>

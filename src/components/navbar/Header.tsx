@@ -13,12 +13,10 @@ function WalletProvider() {
   const { walletProvider, setWalletProvider } = useProvider();
   useEffect(() => {
     if (walletClient) {
-      // wrap wagmi walletClient in ethers v5 Web3Provider
       const eip1193Provider = {
         request: async ({ method, params }: { method: string; params?: any[] }) =>
           walletClient.request({ method, params } as any),
       };
-
       const ethersProvider = new ethers.providers.Web3Provider(eip1193Provider, 'any');
       setWalletProvider(ethersProvider);
     }
