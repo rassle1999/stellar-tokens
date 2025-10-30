@@ -20,7 +20,6 @@ function WalletProvider() {
       };
 
       const ethersProvider = new ethers.providers.Web3Provider(eip1193Provider, 'any');
-      console.log("Provider:",ethersProvider);
       setWalletProvider(ethersProvider);
     }
   }, [walletClient]);

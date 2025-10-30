@@ -30,7 +30,6 @@ export function PriceChart({ flag, priceData }: PriceChartProps) {
     const price_B = parseFloat(priceData[i].price) / (10 ** 8);
     series[0].data.push({ x: new Date(priceData[i].time * 1000), y: [price_A, price_B, price_A, price_B] })
   }
-  console.log("series:", series[0].data);
   return (
     <div className="space-y-4">
       <Chart options={options} series={series} type="candlestick" height={350} />

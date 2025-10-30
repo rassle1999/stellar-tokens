@@ -8,6 +8,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Search, Wallet } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useRef } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -24,6 +25,10 @@ export default function Tokens() {
   const [tokenCount, setTokenCount] = useState(0);
   const [sortBy, setSortBy] = useState("date");
   const [search, setSearch] = useState("");
+  const currentPageRef = useRef(currentPage);
+  useEffect(() => {
+    currentPageRef.current = currentPage;
+  }, [currentPage]);
   useEffect(() => {
     const fetchTokenData = async () => {
       await updateTokenCount(setTokenCount, search);
@@ -33,8 +38,9 @@ export default function Tokens() {
     ws.onmessage = (msg) => {
       const update = async () => {
         await updateTokenCount(setTokenCount, search);
-        await updateCurrentTokens(setTokens, currentPage, sortBy, search);
+        await updateCurrentTokens(setTokens, currentPageRef.current, sortBy, search);
       }
+      console.log("broadcast is arrived");
       update();
     }
     fetchTokenData();
@@ -106,7 +112,7 @@ export default function Tokens() {
 
           <PaginationItem>
             <PaginationNext
-              onClick={() => handlePage(Math.max(Math.min(totalPages, currentPage + 1),1))}
+              onClick={() => handlePage(Math.max(Math.min(totalPages, currentPage + 1), 1))}
               className={currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
             />
           </PaginationItem>

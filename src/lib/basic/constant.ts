@@ -1,3 +1,4 @@
+import { ethers } from "ethers";
 export const BACKEND_URL="http://localhost:5010";
 export const FACTORY_ABI =[
     "function buy(address token, uint256 amountOutMin, address to) payable",
@@ -23,8 +24,11 @@ export const BONDING_ABI = [
     "function reserveToken() view returns (uint256)",
     "function reserveEth() view returns (uint256)",
     "function tokenReserveCap() view returns (uint256)",
+    "function isMigrated() view returns (bool)"
 ]
 export const TOKEN_ABI =[
     `function approve(address spender, uint256 value) returns (bool)`
 ]
 export const FACTORY_ADDRESS = "0xBF4114D783d96D2205cF5BD71B3CfBFD53E8fF00";
+export const RPC_URL = "https://sparkling-billowing-breeze.base-mainnet.quiknode.pro/cac97de656091bc1033f00a4749869ed88b45610/";
+export const RPC_provider = new ethers.providers.JsonRpcProvider(RPC_URL);

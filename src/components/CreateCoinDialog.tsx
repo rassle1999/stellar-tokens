@@ -34,7 +34,6 @@ export function CreateCoinDialog() {
     const priceNum = Math.random() * 0.1;
     const marketCapNum = supplyNum * priceNum;
 
-    console.log("file:", image);
     const formData = new FormData();
     formData.append('file', image); // ⬅️ Must match .single('file')
     formData.append('name', coinName);
@@ -48,7 +47,6 @@ export function CreateCoinDialog() {
       .then(async (data) => {
         const publicUrl = data.publicUrl;
         const urlData = data.urlData;
-        console.log('Public URL:', publicUrl);
         let success;
         try {
           success = await createToken(coinName, symbol, publicUrl, ethers.BigNumber.from(supply), walletProvider.getSigner());

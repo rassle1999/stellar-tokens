@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import { Price } from "@/contexts/PriceContext";
 import { useState } from "react";
 import { updateTrendingTokens } from "@/lib/Tokens/updateTrendingTokens";
-import { getDashChartData } from "@/lib/chart/dashChartData";
 import { updateCurrentTokens } from "@/lib/Tokens/updateCurrentTokens";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -13,10 +12,10 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
+import { updateTokenState } from "@/lib/Tokens/updateTokenState";
+import { RPC_provider } from "@/lib/basic/constant";
 export default function Dashboard() {
   const { tokens ,setTokens } = useTokens();
-  const [ sumData, setSumData] = useState([]);
-  const { getTrendingTokens } = useTokens();
   const [trendingTokens,setTrendingTokens] = useState([]);
   const [tableTokens, setTableTokens] = useState([]);
   const [limit, setLimit] = useState(10);
@@ -24,13 +23,13 @@ export default function Dashboard() {
   useEffect(()=>{
     const fetchData = async () =>{
       await updateTrendingTokens(setTrendingTokens);
-      await updateCurrentTokens(setTableTokens, 1, "latest", "");
+      await updateTokenState(setTableTokens, 10,RPC_provider);
     }
     fetchData();
   },[])
   
   const handleLimitChange = async () => {
-    await updateCurrentTokens(setTableTokens, 1, "latest", "");
+    await updateTokenState(setTableTokens, limit,RPC_provider);
   };
   return (
     <div className="space-y-6 animate-fade-in">
@@ -74,7 +73,7 @@ export default function Dashboard() {
                 <TableHead>Name</TableHead>
                 <TableHead>Symbol</TableHead>
                 <TableHead>Address</TableHead>
-                <TableHead>Migrate</TableHead>
+                {/* <TableHead>Migrate</TableHead> */}
                 <TableHead className="text-right">Price</TableHead>
               </TableRow>
             </TableHeader>
@@ -102,11 +101,11 @@ export default function Dashboard() {
                       </Button>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <Badge variant={token.currentReserve >= token.ethReserveCap ? "default" : "secondary"}>
-                      {token.currentReserve >= token.ethReserveCap ? "Migrated" : "Active"}
+                  {/* <TableCell>
+                    <Badge variant={token.isMigrated ? "default" : "secondary"}>
+                      {token.isMigrated ? "Migrated" : "Active"}
                     </Badge>
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell className="text-right font-semibold">
                     {((parseFloat(token.price)*(10**10))/1e18).toFixed(6)}
                   </TableCell>

@@ -13,7 +13,19 @@ export interface Token {
   ethReserveCap?: number;
   currentReserve?: number;
 }
-
+export const NullToken = () => {
+  return {
+    id: "",
+    name: "",
+    symbol: "",
+    image: "",
+    marketCap: "",
+    price: "",
+    priceChange: 0,
+    createdAt: "",
+    address: ""
+  }
+}
 interface TokenContextType {
   tokens: Token[];
   setTokens: React.Dispatch<React.SetStateAction<Token[]>>;

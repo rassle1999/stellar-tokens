@@ -10,6 +10,9 @@ import { useTokens } from "@/contexts/TokenContext";
 import { buy, sell } from "@/lib/BuySell/buy";
 import { useProvider } from "@/contexts/ProviderContext";
 import { ethers } from "ethers";
+import { Token as TokenType, NullToken } from "@/contexts/TokenContext";
+import { useEffect } from "react";
+import { getTokenDatabyAddress } from "@/lib/Token/tokenData";
 export function BuySellCard() {
   const { id } = useParams();
   const [mode, setMode] = useState<"buy" | "sell">("buy");
@@ -17,7 +20,21 @@ export function BuySellCard() {
   const { toast } = useToast();
   const { getTokenById } = useTokens();
   const { walletProvider, setWalletProvider } = useProvider();
-  const token = getTokenById(id || "");
+  const [token, setToken] = useState<TokenType>(NullToken());
+  // const token = getTokenById(id || "");
+  useEffect(() => {
+    let token_first = getTokenById(id || "");
+    if (!token_first) {
+      token_first = NullToken();
+      const fetchTokenData = async () => {
+        token_first = await getTokenDatabyAddress(id);
+        setToken(token_first);
+      }
+      fetchTokenData();
+    }
+    setToken(token_first);
+  }, []);
+
   const handleTransaction = async () => {
     if (!amount || parseFloat(amount) <= 0) {
       toast({
@@ -42,7 +59,7 @@ export function BuySellCard() {
         description: `You have ${mode === "buy" ? "bought" : "sold"} ${amount} tokens`,
       });
     }
-    else{
+    else {
       toast({
         title: `${mode === "buy" ? "Purchase" : "Sale"} Failed`,
         description: `You haven't ${mode === "buy" ? "bought" : "sold"} ${amount} tokens`,
@@ -100,8 +117,8 @@ export function BuySellCard() {
         <Button
           onClick={handleTransaction}
           className={`w-full ${mode === "buy"
-              ? "bg-success hover:bg-success/90"
-              : "bg-destructive hover:bg-destructive/90"
+            ? "bg-success hover:bg-success/90"
+            : "bg-destructive hover:bg-destructive/90"
             }`}
         >
           {mode === "buy" ? "Buy" : "Sell"}

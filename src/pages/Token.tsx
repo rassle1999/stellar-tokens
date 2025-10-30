@@ -13,6 +13,9 @@ import { useProvider } from "@/contexts/ProviderContext";
 import { getPriceInformation } from "@/lib/Token/priceInformation";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { getTokenDatabyAddress } from "@/lib/Token/tokenData";
+import { Token as TokenType ,NullToken} from "@/contexts/TokenContext";
+import { RPC_provider } from "@/lib/basic/constant";
+import { useRef } from "react";
 const updateReserve = async (setReserve: any, address: string, provider: any) => {
   try {
     const reserveData = await getBondingCurveInfo(address, provider);
@@ -21,24 +24,55 @@ const updateReserve = async (setReserve: any, address: string, provider: any) =>
     console.error("Error updating Reserve:", error);
   }
 };
-const updateToken = async (setToken:any,address:string) => {
-  try {
-    const token = await getTokenDatabyAddress(address);
-    setToken(token);
-  } catch (error) {
-    console.error("Error updating Token:", error);
-  }
-}
 export default function Token() {
   const { id } = useParams();
   const { toast } = useToast();
   const { tokens, getTokenById } = useTokens();
   const { walletProvider, setWalletProvider } = useProvider();
-  const token = getTokenById(id || "");
+  const [token, setToken] =useState<TokenType>(getTokenById(id || "")||NullToken());
   const [Reserve, setReserve] = useState({ reserveToken: "0", reserveEth: "0", tokenReserveCap: "0", ETHRESERVECAP: 5_000_000_000_000_000_000 });
   const [priceData, setPriceData] = useState([]);
   const [timeInterval, setTimeInterval] = useState("1M");
-
+  const timeIntervalRef = useRef(timeInterval);
+    useEffect(() => {
+      timeIntervalRef.current = timeInterval;
+    }, [timeInterval]);
+  
+  useEffect(() => {
+    let token_first = getTokenById(id||"");
+    if(!token_first)
+    {
+      token_first = NullToken();
+      const fetchTokenData = async () =>{
+        token_first = await getTokenDatabyAddress(id);
+        setToken(token_first);
+        await updateReserve(setReserve, token_first.address, RPC_provider);
+        setPriceData(await getPriceInformation(token_first.address, timeInterval));
+      }
+      fetchTokenData();
+    }
+    setToken(token_first);
+    updateReserve(setReserve, token_first.address, RPC_provider);
+    const ws = new WebSocket("ws://localhost:5010");
+    ws.onmessage = (msg) => {
+      const update = async () => {
+        console.log("updating...");
+        const token_rec = await getTokenDatabyAddress(id);
+        setToken({...token_rec});
+        await updateReserve(setReserve, token_rec.address, RPC_provider);
+        const priceData = await getPriceInformation(token_rec.address, timeIntervalRef.current);
+        setPriceData([...priceData]);
+      }
+      console.log("broadcast is arrived",msg);
+      if(msg.data=="{\"type\":1}")
+      update();
+    }
+    const fetchData = async () => {
+      setPriceData(await getPriceInformation(token_first.address, timeInterval));
+    }
+    fetchData();
+    return () => ws.close();
+  }, []);
   if (!token) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -46,22 +80,6 @@ export default function Token() {
       </div>
     );
   }
-  useEffect(() => {
-    updateReserve(setReserve, token.address, walletProvider);
-    const ws = new WebSocket("ws://localhost:5010");
-    ws.onmessage = (msg) => {
-      const update = async () => {
-        setPriceData(await getPriceInformation(token.address, timeInterval));
-      }
-      if(msg.data.type==1)
-      update();
-    }
-    const fetchData = async () => {
-      setPriceData(await getPriceInformation(token.address, timeInterval));
-    }
-    fetchData();
-    return () => ws.close();
-  }, []);
   const handleTimeChange = async (value: string) => {
     setTimeInterval(value);
     setPriceData(await getPriceInformation(token.address, value));
@@ -135,7 +153,7 @@ export default function Token() {
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Current Reserve</span>
-              <span className="font-medium">{Reserve.reserveEth.toString()} / {Reserve.ETHRESERVECAP.toString()} ETH</span>
+              <span className="font-medium">{(parseFloat(Reserve.reserveEth)/1e18).toFixed(2)} / {((Reserve.ETHRESERVECAP)/1e18).toFixed(2)} ETH</span>
             </div>
             <Progress value={progressPercentage} className="h-3" />
             <p className="text-xs text-muted-foreground">
