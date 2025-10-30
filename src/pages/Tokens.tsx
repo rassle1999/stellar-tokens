@@ -63,8 +63,9 @@ export default function Tokens() {
   }
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <div className="flex-1 max-w-md flex gap-2">
+      <div className="flex flex-col gap-4">
+        {/* Search Bar */}
+        <div className="flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -78,14 +79,16 @@ export default function Tokens() {
             <Search className="h-4 w-4" />
           </Button>
         </div>
-        <div className="flex justify-center">
-          <ToggleGroup type="single" value={sortBy} onValueChange={(value) => handleValueChange(value)}>
-            <ToggleGroupItem value="marketCap">Market Cap</ToggleGroupItem>
-            <ToggleGroupItem value="volume">Volume</ToggleGroupItem>
-            <ToggleGroupItem value="date">Date</ToggleGroupItem>
+
+        {/* Toggle Group and Create Button */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <ToggleGroup type="single" value={sortBy} onValueChange={(value) => handleValueChange(value)} className="justify-start">
+            <ToggleGroupItem value="marketCap" className="flex-1 sm:flex-none">Market Cap</ToggleGroupItem>
+            <ToggleGroupItem value="volume" className="flex-1 sm:flex-none">Volume</ToggleGroupItem>
+            <ToggleGroupItem value="date" className="flex-1 sm:flex-none">Date</ToggleGroupItem>
           </ToggleGroup>
+          <CreateCoinDialog />
         </div>
-        <CreateCoinDialog />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
         {tokens.map((token) => (

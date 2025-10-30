@@ -54,16 +54,32 @@ export default function Dashboard() {
       </div>
 
       <div className="space-y-4">
+        <div className="flex items-end gap-2">
+          <div className="flex-1 max-w-xs space-y-2">
+            <Label htmlFor="limit">Show Limit</Label>
+            <Input
+              id="limit"
+              type="number"
+              value={limit}
+              onChange={(e) => setLimit(Number(e.target.value))}
+              min="1"
+              className="bg-secondary"
+            />
+          </div>
+          <Button onClick={() => updateTokenState(setTableTokens, limit, RPC_provider)}>
+            Apply
+          </Button>
+        </div>
 
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Image</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Symbol</TableHead>
-                <TableHead>Address</TableHead>
-                <TableHead className="text-right">Price</TableHead>
+                <TableHead className="w-16">Image</TableHead>
+                <TableHead className="min-w-[120px]">Name</TableHead>
+                <TableHead className="min-w-[80px]">Symbol</TableHead>
+                <TableHead className="min-w-[140px]">Address</TableHead>
+                <TableHead className="text-right min-w-[100px]">Price</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
