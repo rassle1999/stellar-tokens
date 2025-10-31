@@ -9,8 +9,13 @@ export function PriceChart({ flag, priceData }: PriceChartProps) {
   const options: ApexOptions = {
     chart: { type: "candlestick" },
     xaxis: { type: "datetime" },
+    yaxis: {
+      labels: {
+        formatter: (value: number) => value.toFixed(3),
+      },
+    },
     tooltip: {
-      theme: "black", // ✅ force light mode tooltip (black text)
+      theme: "black",
       style: {
         fontSize: "12px",
         fontFamily: "inherit",

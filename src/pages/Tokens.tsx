@@ -17,6 +17,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { BACKEND_WS_URL } from "@/lib/basic/constant";
 const ITEMS_PER_PAGE = 6;
 
 export default function Tokens() {
@@ -34,7 +35,7 @@ export default function Tokens() {
       await updateTokenCount(setTokenCount, search);
       await updateCurrentTokens(setTokens, currentPage, sortBy, search);
     }
-    const ws = new WebSocket("ws://localhost:5010");
+    const ws = new WebSocket(BACKEND_WS_URL);
     ws.onmessage = (msg) => {
       const update = async () => {
         await updateTokenCount(setTokenCount, search);
@@ -58,8 +59,9 @@ export default function Tokens() {
     await updateCurrentTokens(setTokens, currentPage, mode, search);
   }
   const handleClick = async () => {
+    setCurrentPage(1);
     await updateTokenCount(setTokenCount, search);
-    await updateCurrentTokens(setTokens, currentPage, sortBy, search);
+    await updateCurrentTokens(setTokens, 1, sortBy, search);
   }
   return (
     <div className="space-y-6 animate-fade-in">

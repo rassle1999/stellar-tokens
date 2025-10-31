@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 export const BACKEND_URL="http://localhost:5010";
+export const BACKEND_WS_URL = "ws://localhost:5010";
 export const FACTORY_ABI =[
     "function buy(address token, uint256 amountOutMin, address to) payable",
     "function sell(address token, uint256 amount, uint256 amountOutMin, address to)",
@@ -32,3 +33,4 @@ export const TOKEN_ABI =[
 export const FACTORY_ADDRESS = "0xBF4114D783d96D2205cF5BD71B3CfBFD53E8fF00";
 export const RPC_URL = "https://sparkling-billowing-breeze.base-mainnet.quiknode.pro/cac97de656091bc1033f00a4749869ed88b45610/";
 export const RPC_provider = new ethers.providers.JsonRpcProvider(RPC_URL);
+export const FAKEINITIALLIQUIDITY = 1500_000_000_000_000_000;

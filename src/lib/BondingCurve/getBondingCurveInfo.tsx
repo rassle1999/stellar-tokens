@@ -1,18 +1,20 @@
 import { ethers } from "ethers";
-import { FACTORY_ADDRESS,FACTORY_ABI,BONDING_ABI} from "../basic/constant";
-export const getBondingCurveInfo = async (address:string,provider:any) => {
+import { FACTORY_ADDRESS, FACTORY_ABI, BONDING_ABI } from "../basic/constant";
+export const getBondingCurveInfo = async (address: string, provider: any) => {
     const contract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
     const bondingCurveAddress = await contract.bondingCurveMap(address);
-    const bondingCurveContract = new ethers.Contract(bondingCurveAddress,BONDING_ABI,provider );
-    const reserveToken = await bondingCurveContract.reserveToken();
-    const reserveEth = await bondingCurveContract.reserveEth();
-    const tokenReserveCap = await bondingCurveContract.tokenReserveCap();
-    return {reserveToken:reserveToken.toString(),reserveEth:reserveEth.toString(),tokenReserveCap:tokenReserveCap.toString(),ETHRESERVECAP:5_000_000_000_000_000_000};
+    const bondingCurveContract = new ethers.Contract(bondingCurveAddress, BONDING_ABI, provider);
+    const [reserveToken, reserveEth, tokenReserveCap] = await Promise.all([
+        bondingCurveContract.reserveToken(),
+        bondingCurveContract.reserveEth(),
+        bondingCurveContract.tokenReserveCap(),
+    ]);
+    return { reserveToken: reserveToken.toString(), reserveEth: reserveEth.toString(), tokenReserveCap: tokenReserveCap.toString(), ETHRESERVECAP: 5_000_000_000_000_000_000 };
 }
-export const isMigrated = async (address:string,provider:any) =>{
+export const isMigrated = async (address: string, provider: any) => {
     const contract = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
     const bondingCurveAddress = await contract.bondingCurveMap(address);
-    const bondingCurveContract = new ethers.Contract(bondingCurveAddress,BONDING_ABI,provider );
+    const bondingCurveContract = new ethers.Contract(bondingCurveAddress, BONDING_ABI, provider);
     const isMigrated = await bondingCurveContract.isMigrated();
-    return {isMigrated:isMigrated};
+    return { isMigrated: isMigrated };
 }

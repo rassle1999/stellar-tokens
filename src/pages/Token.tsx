@@ -16,6 +16,8 @@ import { getTokenDatabyAddress } from "@/lib/Token/tokenData";
 import { Token as TokenType ,NullToken} from "@/contexts/TokenContext";
 import { RPC_provider } from "@/lib/basic/constant";
 import { useRef } from "react";
+import { BACKEND_WS_URL } from "@/lib/basic/constant";
+import { FAKEINITIALLIQUIDITY } from "@/lib/basic/constant";
 const updateReserve = async (setReserve: any, address: string, provider: any) => {
   try {
     const reserveData = await getBondingCurveInfo(address, provider);
@@ -53,7 +55,7 @@ export default function Token() {
     }
     setToken(token_first);
     updateReserve(setReserve, token_first.address, RPC_provider);
-    const ws = new WebSocket("ws://localhost:5010");
+    const ws = new WebSocket(BACKEND_WS_URL);
     ws.onmessage = (msg) => {
       const update = async () => {
         console.log("updating...");
@@ -85,7 +87,7 @@ export default function Token() {
     setPriceData(await getPriceInformation(token.address, value));
   }
 
-  const progressPercentage = (parseFloat(Reserve.reserveEth) / Reserve.ETHRESERVECAP) * 100;
+  const progressPercentage = (((parseFloat(Reserve.reserveEth)||FAKEINITIALLIQUIDITY)-FAKEINITIALLIQUIDITY) / (Reserve.ETHRESERVECAP-FAKEINITIALLIQUIDITY)) * 100;
 
   const copyAddress = () => {
     navigator.clipboard.writeText(token.address);
@@ -115,11 +117,11 @@ export default function Token() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Market Cap</p>
-                  <p className="text-xl font-semibold">{(parseFloat(token.marketCap)/1e36).toFixed(3)}</p>
+                  <p className="text-l font-semibold">{(parseFloat(token.marketCap)/1e36).toFixed(3)}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Price</p>
-                  <p className="text-xl font-semibold text-primary">{(parseFloat(token.price)/1e18 * (10 ** 10)).toFixed(3)} X 10<sup>-10</sup></p>
+                  <p className="text-l font-semibold text-primary">{(parseFloat(token.price)/1e18 * (10 ** 10)).toFixed(3)} X 10<sup>-10</sup></p>
                 </div>
               </div>
 
@@ -127,12 +129,12 @@ export default function Token() {
                 <div className="flex items-center gap-2 text-sm">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Created:</span>
-                  <span className="font-medium">{(new Date(parseInt(token.createdAt) * 1000)).toUTCString()}</span>
+                  <span className="font-medium">{(new Date(parseInt(token.createdAt) * 1000)).toLocaleDateString()}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-muted-foreground">Contract:</span>
                   <code className="bg-secondary px-2 py-1 rounded text-xs font-mono">
-                    {token.address.slice(0, 10)}...{token.address.slice(-8)}
+                    {token.address.slice(0, 10)}...{token.address.slice(-4)}
                   </code>
                   <Button
                     variant="ghost"
@@ -153,7 +155,7 @@ export default function Token() {
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Current Reserve</span>
-              <span className="font-medium">{(parseFloat(Reserve.reserveEth)/1e18).toFixed(2)} / {((Reserve.ETHRESERVECAP)/1e18).toFixed(2)} ETH</span>
+              <span className="font-medium">{(((parseFloat(Reserve.reserveEth)||FAKEINITIALLIQUIDITY)-FAKEINITIALLIQUIDITY)/1e18).toFixed(2)} / {((Reserve.ETHRESERVECAP-FAKEINITIALLIQUIDITY)/1e18).toFixed(2)} ETH</span>
             </div>
             <Progress value={progressPercentage} className="h-3" />
             <p className="text-xs text-muted-foreground">
